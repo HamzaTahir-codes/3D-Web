@@ -1,14 +1,15 @@
 import * as THREE from 'three';
 
 export class InteractionSystem {
-  constructor(camera, renderer) {
-    this.camera = camera;
-    this.renderer = renderer;
+  constructor(context) {
+    this.camera = context.camera;
+    this.renderer = context.renderer.instance;
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2(-1, -1);
     
     this.interactiveObjects = [];
     this.hoveredObject = null;
+    this.stateManager = context.stateManager;
 
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
     window.addEventListener('click', (e) => this.onClick(e));
@@ -54,6 +55,17 @@ export class InteractionSystem {
         if (this.hoveredObject.userData.onHoverEnter) {
           this.hoveredObject.userData.onHoverEnter(this.hoveredObject);
         }
+
+        // Update global state for tooltips
+        this.stateManager.setState({ 
+          hoveredSection: this.hoveredObject.userData.section,
+          hoveredPosition: this.getScreenPosition(this.hoveredObject)
+        });
+      } else {
+        // Update position even if object is same
+        this.stateManager.setState({ 
+          hoveredPosition: this.getScreenPosition(this.hoveredObject)
+        });
       }
     } else {
       if (this.hoveredObject) {
@@ -61,8 +73,20 @@ export class InteractionSystem {
           this.hoveredObject.userData.onHoverExit(this.hoveredObject);
         }
         this.hoveredObject = null;
+        this.stateManager.setState({ hoveredSection: null, hoveredPosition: null });
       }
     }
+  }
+
+  getScreenPosition(object) {
+    const vector = new THREE.Vector3();
+    object.getWorldPosition(vector);
+    vector.project(this.camera);
+
+    return {
+      x: (vector.x * 0.5 + 0.5) * window.innerWidth,
+      y: -(vector.y * 0.5 - 0.5) * window.innerHeight
+    };
   }
 
   dispose() {

@@ -5,7 +5,9 @@ import { CameraController } from './core/CameraController';
 import { InteractionSystem } from './systems/InteractionSystem';
 import { SceneManager } from './core/SceneManager';
 import { NavigationSystem } from './systems/NavigationSystem';
-import { TestScene } from './scenes/TestScene';
+import { HomeScene } from './scenes/HomeScene';
+import { initTerminalUI } from './components/TerminalUI';
+import { initTooltip } from './components/Tooltip';
 
 class App {
   constructor() {
@@ -21,27 +23,38 @@ class App {
     this.camera.position.z = 5;
 
     this.cameraController = new CameraController(this.camera);
-    this.interactionSystem = new InteractionSystem(this.camera, this.renderer.instance);
     
     this.context = {
       renderer: this.renderer,
       camera: this.camera,
-      interactionSystem: this.interactionSystem,
       stateManager: stateManager,
       cameraController: this.cameraController
     };
+
+    this.interactionSystem = new InteractionSystem(this.context);
+    this.context.interactionSystem = this.interactionSystem;
 
     this.sceneManager = new SceneManager(this.context);
     this.navigationSystem = new NavigationSystem(this.sceneManager, stateManager);
 
     // Register scenes
-    this.navigationSystem.registerScene('home', TestScene);
+    this.navigationSystem.registerScene('home', HomeScene);
+    // Placeholder for other scenes
+    this.navigationSystem.registerScene('projects', HomeScene); // Temp
+    this.navigationSystem.registerScene('skills', HomeScene); // Temp
+    this.navigationSystem.registerScene('experience', HomeScene); // Temp
+    this.navigationSystem.registerScene('about', HomeScene); // Temp
+    this.navigationSystem.registerScene('contact', HomeScene); // Temp
 
     this.clock = new THREE.Clock();
     this.init();
   }
 
   async init() {
+    // Initial UI
+    initTerminalUI(this.container);
+    initTooltip(this.container);
+    
     // Initial scene load
     stateManager.setState({ currentScene: 'home' });
     this.animate();
@@ -49,6 +62,12 @@ class App {
 
   animate() {
     const delta = this.clock.getDelta();
+
+    // Update parallax from interaction system mouse
+    this.cameraController.setParallax(
+      this.interactionSystem.mouse.x,
+      this.interactionSystem.mouse.y
+    );
 
     this.interactionSystem.update();
     this.cameraController.update(delta);

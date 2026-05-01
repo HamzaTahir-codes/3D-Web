@@ -9,6 +9,10 @@ export class CameraController {
     
     this.lerpFactor = 0.05;
     this.isTransitioning = false;
+    
+    this.mouseParallax = { x: 0, y: 0 };
+    this.parallaxIntensity = 1.5;
+    this.zoomFactor = 1.0;
   }
 
   moveTo(position, lookAt = null, duration = null) {
@@ -17,14 +21,30 @@ export class CameraController {
     this.isTransitioning = true;
   }
 
+  setParallax(x, y) {
+    this.mouseParallax.x = x;
+    this.mouseParallax.y = y;
+  }
+
+  setZoom(factor) {
+    this.zoomFactor = factor;
+  }
+
   update(delta) {
-    // Simple lerp for smooth movement
-    this.camera.position.lerp(this.targetPosition, this.lerpFactor);
+    // Target position with parallax and zoom
+    const finalTarget = this.targetPosition.clone()
+      .multiplyScalar(this.zoomFactor) // Zoom effect
+      .add(new THREE.Vector3(
+        this.mouseParallax.x * this.parallaxIntensity,
+        this.mouseParallax.y * this.parallaxIntensity,
+        0
+      ));
+
+    this.camera.position.lerp(finalTarget, this.lerpFactor);
     this.currentLookAt.lerp(this.targetLookAt, this.lerpFactor);
     this.camera.lookAt(this.currentLookAt);
 
-    // Check if we are close enough to stop "transitioning" state
-    if (this.camera.position.distanceTo(this.targetPosition) < 0.01) {
+    if (this.camera.position.distanceTo(finalTarget) < 0.01) {
       this.isTransitioning = false;
     }
   }
