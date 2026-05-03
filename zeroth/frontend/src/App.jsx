@@ -24,7 +24,12 @@ export default function App() {
 
   return (
     <main style={{ width: '100vw', minHeight: '100vh', background: '#000' }}>
-      <Home />
+      <div id="home"><Home /></div>
+      <div id="projects"><Projects /></div>
+      <div id="skills"><Skills /></div>
+      <div id="experience"><Experience /></div>
+      <div id="about"><About /></div>
+      <div id="contact"><Contact /></div>
     </main>
   )
 }
