@@ -2,19 +2,22 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.static import serve
+from django.http import FileResponse, Http404
 import os
 
-from projects.views import ProjectList, ProjectDetail
-from contact.views import ContactCreate
+def resume_download(request):
+    resume_path = os.path.join(settings.MEDIA_ROOT, 'resume.pdf')
+    if os.path.exists(resume_path):
+        return FileResponse(
+            open(resume_path, 'rb'),
+            as_attachment=True,
+            filename='Muhammad_Hamza_Tahir_Resume.pdf'
+        )
+    raise Http404("Resume not found.")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/projects/', ProjectList.as_view(), name='project-list'),
-    path('api/projects/<int:pk>/', ProjectDetail.as_view(), name='project-detail'),
-    path('api/contact/', ContactCreate.as_view(), name='contact-create'),
-    path('api/resume/', serve, {'path': 'resume.pdf', 'document_root': settings.MEDIA_ROOT}),
-]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('api/projects/', include('projects.urls')),
+    path('api/contact/', include('contact.urls')),
+    path('api/resume/', resume_download, name='resume-download'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
