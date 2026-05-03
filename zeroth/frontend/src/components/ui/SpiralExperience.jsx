@@ -1,17 +1,17 @@
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import SpiralNode from '../three/SpiralNode'
 import SpiralPath from '../three/SpiralPath'
+import SpiralCamera from '../three/SpiralCamera'
 import { spiralPhases, getProjectContext } from '../../data/spiralWorkflow'
 import { useTypedText } from '../../hooks/useTypedText'
 
 function TypedPanel({ phase, project }) {
-  const context = getProjectContext(project.category)[project.category]
-    || getProjectContext(project.category).other
-  const lines = phase.lines
-  const displayed = useTypedText(lines, 22)
+  const contextMap = getProjectContext(project.category)
+  const context = contextMap[project.category] || contextMap.other
+  const displayed = useTypedText(phase.lines, 22)
 
   return (
     <div style={{
@@ -36,31 +36,29 @@ function TypedPanel({ phase, project }) {
             animate={{ opacity: 1 }}
             style={{
               fontSize: '15px',
-              color: i === displayed.length - 1 ? '#ffffff' : '#666666',
+              color: i === displayed.length - 1 ? '#ffffff' : '#555555',
               lineHeight: '1.8',
               margin: '0 0 4px',
             }}
           >
             {line}
             {i === displayed.length - 1 && (
-              <span
-                style={{
-                  display: 'inline-block',
-                  width: '8px',
-                  height: '14px',
-                  background: phase.color,
-                  marginLeft: '4px',
-                  verticalAlign: 'middle',
-                  animation: 'blink 1s step-end infinite',
-                }}
-              />
+              <span style={{
+                display: 'inline-block',
+                width: '8px',
+                height: '14px',
+                background: phase.color,
+                marginLeft: '4px',
+                verticalAlign: 'middle',
+                animation: 'blink 1s step-end infinite',
+              }} />
             )}
           </motion.p>
         ))}
       </div>
 
       {context && (
-        <div style={{ marginBottom: '20px' }}>
+        <div>
           <div style={{
             fontSize: '10px',
             color: '#333',
@@ -90,14 +88,28 @@ function TypedPanel({ phase, project }) {
 
 export default function SpiralExperience({ project, onClose }) {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [pulseKeys, setPulseKeys] = useState(
+    spiralPhases.map(() => 0)
+  )
+  const orbitRef = useRef()
   const phase = spiralPhases[activeIndex]
+
+  const activatePhase = (index) => {
+    setActiveIndex(index)
+    setPulseKeys((prev) => {
+      const next = [...prev]
+      next[index] = prev[index] + 1
+      return next
+    })
+  }
 
   const goNext = () => {
     if (activeIndex < spiralPhases.length - 1)
-      setActiveIndex(activeIndex + 1)
+      activatePhase(activeIndex + 1)
   }
   const goPrev = () => {
-    if (activeIndex > 0) setActiveIndex(activeIndex - 1)
+    if (activeIndex > 0)
+      activatePhase(activeIndex - 1)
   }
 
   return (
@@ -132,18 +144,27 @@ export default function SpiralExperience({ project, onClose }) {
         flexShrink: 0,
       }}>
         <div>
-          <div style={{ fontSize: '10px', color: '#333', letterSpacing: '0.15em' }}>
+          <div style={{
+            fontSize: '10px',
+            color: '#333',
+            letterSpacing: '0.15em',
+          }}>
             HOW IT WAS BUILT
           </div>
-          <div style={{ fontSize: '16px', color: '#fff', marginTop: '2px' }}>
+          <div style={{
+            fontSize: '16px',
+            color: '#fff',
+            marginTop: '2px',
+          }}>
             {project.title}
           </div>
         </div>
+
         <div style={{ display: 'flex', gap: '8px' }}>
           {spiralPhases.map((p, i) => (
             <div
               key={p.id}
-              onClick={() => setActiveIndex(i)}
+              onClick={() => activatePhase(i)}
               style={{
                 width: '28px',
                 height: '3px',
@@ -155,6 +176,7 @@ export default function SpiralExperience({ project, onClose }) {
             />
           ))}
         </div>
+
         <button
           onClick={onClose}
           style={{
@@ -173,47 +195,59 @@ export default function SpiralExperience({ project, onClose }) {
       </div>
 
       {/* Main content */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        overflow: 'hidden',
-      }}>
-        {/* 3D spiral canvas */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+
+        {/* 3D canvas */}
         <div style={{ flex: 1 }}>
           <Canvas
             camera={{ position: [0, 0, 11], fov: 58 }}
-            gl={{ antialias: true, powerPreference: 'high-performance' }}
+            gl={{
+              antialias: true,
+              powerPreference: 'high-performance',
+            }}
           >
             <ambientLight intensity={0.3} />
-            <pointLight position={[0, 0, 6]} intensity={2} color="#ffffff" />
+            <pointLight position={[0, 0, 6]} intensity={2} />
             <pointLight
               position={spiralPhases[activeIndex].position}
-              intensity={4}
+              intensity={5}
               color={spiralPhases[activeIndex].color}
             />
-            <Suspense fallback={null}>
-              <SpiralPath activeIndex={activeIndex} />
-              {spiralPhases.map((p, i) => (
-                <SpiralNode
-                  key={p.id}
-                  index={i}
-                  position={p.position}
-                  color={p.color}
-                  icon={p.icon}
-                  phase={p.phase}
-                  isActive={i === activeIndex}
-                  isCompleted={i < activeIndex}
-                  onClick={() => setActiveIndex(i)}
-                />
-              ))}
-            </Suspense>
+
+            {/* Tilt the entire spiral group */}
+            <group rotation={[0.52, 0.18, 0.12]}>
+              <Suspense fallback={null}>
+                <SpiralPath activeIndex={activeIndex} />
+                {spiralPhases.map((p, i) => (
+                  <SpiralNode
+                    key={p.id}
+                    index={i}
+                    position={p.position}
+                    color={p.color}
+                    icon={p.icon}
+                    phase={p.phase}
+                    isActive={i === activeIndex}
+                    isCompleted={i < activeIndex}
+                    pulseKey={pulseKeys[i]}
+                    onClick={() => activatePhase(i)}
+                  />
+                ))}
+              </Suspense>
+            </group>
+
+            <SpiralCamera
+              targetPosition={spiralPhases[activeIndex].position}
+              activeIndex={activeIndex}
+            />
+
             <OrbitControls
+              ref={orbitRef}
               enableZoom={true}
               enablePan={false}
               autoRotate
-              autoRotateSpeed={0.5}
-              minDistance={5}
-              maxDistance={14}
+              autoRotateSpeed={0.3}
+              minDistance={6}
+              maxDistance={16}
             />
           </Canvas>
         </div>
@@ -240,7 +274,6 @@ export default function SpiralExperience({ project, onClose }) {
             </motion.div>
           </AnimatePresence>
 
-          {/* Navigation */}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -268,8 +301,10 @@ export default function SpiralExperience({ project, onClose }) {
               style={{
                 background: activeIndex === spiralPhases.length - 1
                   ? phase.color : 'none',
-                border: `1px solid ${activeIndex === spiralPhases.length - 1
-                  ? phase.color : '#333'}`,
+                border: `1px solid ${
+                  activeIndex === spiralPhases.length - 1
+                    ? phase.color : '#333'
+                }`,
                 color: '#fff',
                 borderRadius: '6px',
                 padding: '10px 24px',

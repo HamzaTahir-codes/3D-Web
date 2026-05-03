@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
-import * as THREE from 'three'
+import PulseRing from './PulseRing'
 
 export default function SpiralNode({
   position,
@@ -12,6 +12,7 @@ export default function SpiralNode({
   isCompleted,
   onClick,
   index,
+  pulseKey,
 }) {
   const meshRef = useRef()
   const ringRef = useRef()
@@ -24,20 +25,14 @@ export default function SpiralNode({
       meshRef.current.rotation.x = Math.sin(t * 0.3 + index) * 0.1
       const s = isActive
         ? 1.3 + Math.sin(t * 3) * 0.08
-        : isCompleted
-        ? 1.1
-        : hovered
-        ? 1.15
-        : 1.0
+        : isCompleted ? 1.1
+        : hovered ? 1.15 : 1.0
       meshRef.current.scale.setScalar(s)
     }
     if (ringRef.current) {
       ringRef.current.rotation.z = t * 0.6 + index
       ringRef.current.material.opacity = isActive
-        ? 0.9
-        : isCompleted
-        ? 0.5
-        : 0.2
+        ? 0.9 : isCompleted ? 0.5 : 0.2
     }
   })
 
@@ -54,6 +49,12 @@ export default function SpiralNode({
         document.body.style.cursor = 'default'
       }}
     >
+      <PulseRing
+        position={[0, 0, 0]}
+        color={color}
+        trigger={pulseKey}
+      />
+
       {/* Outer spinning ring */}
       <mesh ref={ringRef}>
         <torusGeometry args={[0.55, 0.03, 8, 60]} />
@@ -90,7 +91,6 @@ export default function SpiralNode({
       >
         {icon}
       </Text>
-
     </group>
   )
 }
