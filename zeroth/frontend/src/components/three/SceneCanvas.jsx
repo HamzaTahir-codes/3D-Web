@@ -26,6 +26,7 @@ export default function SceneCanvas({ children, camera, gravity, physics }) {
 
   return (
     <Canvas
+      frameloop="demand"
       shadows={!lowPerformanceMode}
       camera={camera || { position: [0, 2, 8], fov: 75, near: 0.1, far: 1000 }}
       gl={{
@@ -34,7 +35,7 @@ export default function SceneCanvas({ children, camera, gravity, physics }) {
         stencil: false,
         shadowMapType: 1,
       }}
-      style={{ width: '100%', height: '100%' }}
+      style={{ width: '100%', height: '100%', touchAction: 'pan-y' }}
       dpr={lowPerformanceMode ? [1, 1] : [1, 2]}
     >
       {physics ? (
