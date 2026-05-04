@@ -10,14 +10,22 @@ export function usePerformance() {
 
   const measure = useCallback(() => {
     let last = performance.now()
+    let samples = 0
 
     const loop = () => {
       const now = performance.now()
       const delta = now - last
       last = now
 
+      // Skip the first few frames to allow for initialization
+      samples++
+      if (samples < 120) {
+        frameRef.current = requestAnimationFrame(loop)
+        return
+      }
+
       frameTimesRef.current.push(delta)
-      if (frameTimesRef.current.length > 60) {
+      if (frameTimesRef.current.length > 100) {
         frameTimesRef.current.shift()
       }
 
@@ -26,10 +34,13 @@ export function usePerformance() {
         frameTimesRef.current.length
       const fps = 1000 / avg
 
-      if (fps < 40) {
-        setLowPerformanceMode(true)
-      } else {
-        setLowPerformanceMode(false)
+      // Only switch to low performance if we have enough samples
+      if (frameTimesRef.current.length === 100) {
+        if (fps < 35) {
+          setLowPerformanceMode(true)
+        } else if (fps > 50) {
+          setLowPerformanceMode(false)
+        }
       }
 
       frameRef.current = requestAnimationFrame(loop)
