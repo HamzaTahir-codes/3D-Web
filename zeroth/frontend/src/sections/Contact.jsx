@@ -160,7 +160,7 @@ export default function Contact() {
               → m.hamza.codes@gmail.com
             </a>
             <a
-              href="https://linkedin.com/in/m-hamza-tahir"
+              href="https://linkedin.com/in/m-hamza-tahir-dev-eng/"
               target="_blank"
               rel="noopener noreferrer"
               style={{
