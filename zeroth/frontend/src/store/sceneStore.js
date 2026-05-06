@@ -1,9 +1,12 @@
 import { create } from 'zustand'
 
+const getIsMobile = () =>
+  typeof window !== 'undefined' && window.innerWidth < 768
+
 export const useSceneStore = create((set) => ({
   activeSection: 'home',
   isTransitioning: false,
-  isMobile: window.innerWidth < 768,
+  isMobile: getIsMobile(),
   lowPerformanceMode: false,
 
   setActiveSection: (section) => set({ activeSection: section }),

@@ -6,6 +6,7 @@ import ProjectDetail from '../components/ui/ProjectDetail'
 import SpiralExperience from '../components/ui/SpiralExperience'
 import SectionTransition from '../components/ui/SectionTransition'
 import MobileFallback from '../components/ui/MobileFallback'
+import SectionHeader from '../components/ui/SectionHeader'
 import { getFeaturedProjects } from '../api'
 
 export default function Projects() {
@@ -48,21 +49,13 @@ export default function Projects() {
           height: '100vh',
           background: '#000',
           position: 'relative',
+          overscrollBehavior: 'contain',
         }}
       >
-        <div style={{
-          position: 'absolute',
-          top: '32px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          fontFamily: 'monospace',
-          fontSize: '11px',
-          color: '#444',
-          letterSpacing: '0.2em',
-          zIndex: 10,
-        }}>
-          PROJECTS
-        </div>
+        <SectionHeader
+          title="Projects"
+          subtitle="click a card to explore — ⚡ to see how it was built"
+        />
 
         <MobileFallback>
           {loading && (
