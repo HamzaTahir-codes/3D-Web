@@ -1,0 +1,19 @@
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="200" rx="20" fill="#0F1117"/>
+
+  <!-- [ bracket -->
+  <rect x="84" y="48" width="10" height="104" rx="2" fill="#1D9E75"/>
+  <rect x="84" y="48" width="36" height="10" rx="2" fill="#1D9E75"/>
+  <rect x="84" y="142" width="36" height="10" rx="2" fill="#1D9E75"/>
+
+  <!-- 0 oval -->
+  <ellipse cx="200" cy="100" rx="44" ry="52" fill="none" stroke="#1D9E75" stroke-width="10"/>
+
+  <!-- ] bracket -->
+  <rect x="306" y="48" width="10" height="104" rx="2" fill="#1D9E75"/>
+  <rect x="280" y="48" width="36" height="10" rx="2" fill="#1D9E75"/>
+  <rect x="280" y="142" width="36" height="10" rx="2" fill="#1D9E75"/>
+
+  <!-- wordmark -->
+  <text x="200" y="178" text-anchor="middle" fill="#1D9E75" font-size="13" letter-spacing="6" font-weight="500" font-family="monospace">ZEROTH</text>
+</svg>
