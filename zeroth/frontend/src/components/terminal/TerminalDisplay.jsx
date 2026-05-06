@@ -57,24 +57,28 @@ function TerminalLine({ line, index }) {
 }
 
 export default function TerminalDisplay({ history }) {
-  const bottomRef = useRef()
+  const containerRef = useRef()
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (containerRef.current) {
+      containerRef.current.scrollTop =
+        containerRef.current.scrollHeight
+    }
   }, [history])
 
   return (
-    <div style={{
-      flex: 1,
-      overflowY: 'auto',
-      padding: '20px 24px',
-      scrollbarWidth: 'thin',
-      scrollbarColor: '#222 transparent',
-    }}>
+    <div
+      ref={containerRef}
+      style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '20px 24px',
+        scrollbarWidth: 'thin',
+        scrollbarColor: '#222 transparent',
+      }}>
       {history.map((line, i) => (
         <TerminalLine key={i} line={line} index={i} />
       ))}
-      <div ref={bottomRef} />
     </div>
   )
 }
