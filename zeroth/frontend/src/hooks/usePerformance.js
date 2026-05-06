@@ -17,15 +17,15 @@ export function usePerformance() {
       const delta = now - last
       last = now
 
-      // Skip the first few frames to allow for initialization
+      // Skip the first 180 frames (approx 3 seconds) to allow for all mounting/parsing
       samples++
-      if (samples < 120) {
+      if (samples < 180) {
         frameRef.current = requestAnimationFrame(loop)
         return
       }
 
       frameTimesRef.current.push(delta)
-      if (frameTimesRef.current.length > 100) {
+      if (frameTimesRef.current.length > 120) {
         frameTimesRef.current.shift()
       }
 
@@ -34,11 +34,13 @@ export function usePerformance() {
         frameTimesRef.current.length
       const fps = 1000 / avg
 
-      // Only switch to low performance if we have enough samples
-      if (frameTimesRef.current.length === 100) {
-        if (fps < 35) {
+      // Only switch modes if we have a full stable window
+      if (frameTimesRef.current.length === 120) {
+        // High quality: > 55 FPS
+        // Low quality: < 40 FPS
+        if (fps < 40) {
           setLowPerformanceMode(true)
-        } else if (fps > 50) {
+        } else if (fps > 55) {
           setLowPerformanceMode(false)
         }
       }

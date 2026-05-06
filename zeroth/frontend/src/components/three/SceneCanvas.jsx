@@ -26,7 +26,6 @@ export default function SceneCanvas({ children, camera, gravity, physics }) {
 
   return (
     <Canvas
-      frameloop="demand"
       shadows={!lowPerformanceMode}
       camera={camera || { position: [0, 2, 8], fov: 75, near: 0.1, far: 1000 }}
       gl={{
