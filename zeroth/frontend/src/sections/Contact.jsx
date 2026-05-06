@@ -24,9 +24,11 @@ export default function Contact() {
       <div
         id="contact"
         style={{
+          position: 'relative',
           width: '100vw',
-          height: '100vh',
-          background: '#000',
+          minHeight: '100vh',
+          background: '#000000',
+          overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -34,7 +36,12 @@ export default function Contact() {
           boxSizing: 'border-box',
         }}
       >
+        {/* CSS starfield */}
+        <div className="starfield" />
+
         <div style={{
+          position: 'relative',
+          zIndex: 1,
           width: '100%',
           maxWidth: '760px',
           display: 'flex',

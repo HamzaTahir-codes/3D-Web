@@ -13,6 +13,10 @@ export default function App() {
   usePerformance()
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
+
+  useEffect(() => {
     const handleResize = () => {
       useSceneStore.setState({
         isMobile: window.innerWidth < 768,

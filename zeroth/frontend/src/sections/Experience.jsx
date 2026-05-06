@@ -8,6 +8,7 @@ import TimelineCamera from '../components/three/TimelineCamera'
 import SectionHeader from '../components/ui/SectionHeader'
 import SectionTransition from '../components/ui/SectionTransition'
 import MobileFallback from '../components/ui/MobileFallback'
+import Particles from '../components/three/Particles'
 import { experiences } from '../data/experienceData'
 
 export default function Experience() {
@@ -59,6 +60,7 @@ export default function Experience() {
             dpr={[1, 2]}
           >
             <ambientLight intensity={0.2} />
+            <Particles />
             <pointLight
               position={[0, 10, 0]}
               intensity={1}

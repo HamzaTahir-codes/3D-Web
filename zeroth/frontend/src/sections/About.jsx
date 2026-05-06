@@ -6,6 +6,7 @@ import WorkspaceNode from '../components/three/WorkspaceNode'
 import SectionHeader from '../components/ui/SectionHeader'
 import SectionTransition from '../components/ui/SectionTransition'
 import MobileFallback from '../components/ui/MobileFallback'
+import Particles from '../components/three/Particles'
 import { workspaceObjects, mindset, vision } from '../data/aboutData'
 
 function DeskSurface() {
@@ -137,6 +138,8 @@ export default function About() {
               <ambientLight intensity={
                 activeObject ? 0.05 : 0.25
               } />
+
+              <Particles />
 
               {/* Main overhead light */}
               <pointLight
