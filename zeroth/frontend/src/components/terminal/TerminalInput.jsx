@@ -12,7 +12,7 @@ export default function TerminalInput({
   const inputRef = useRef()
 
   useEffect(() => {
-    if (!isDone) inputRef.current?.focus()
+    if (!isDone) inputRef.current?.focus({ preventScroll: true })
   }, [currentStep, isDone])
 
   if (isDone) return null
